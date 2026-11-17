@@ -1,0 +1,6 @@
+.metadata/
+**/target/
+**/.DS_Store
+*.log
+.env
+

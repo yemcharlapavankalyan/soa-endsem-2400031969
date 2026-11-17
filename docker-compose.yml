@@ -1,0 +1,57 @@
+name: endexam-2400031969
+
+services:
+
+  postgresdb:
+    image: postgres:16-alpine
+    platform: linux/amd64
+    container_name: endexam-2400031969-postgres
+    restart: unless-stopped
+
+    environment:
+      POSTGRES_USER: yemcharlapavankalyan
+      POSTGRES_PASSWORD: "1234"
+      POSTGRES_DB: endexam_2400031969
+
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U yemcharlapavankalyan -d endexam_2400031969"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+      start_period: 10s
+
+    networks:
+      - endexam-network
+
+  crud-service:
+    image: endexam-2400031969-crud-service:latest
+    platform: linux/amd64
+    container_name: endexam-2400031969-crud-service
+
+    build:
+      context: ./CrudServiceProject
+      dockerfile: Dockerfile
+
+    ports:
+      - "8080:8081"
+
+    depends_on:
+      postgresdb:
+        condition: service_healthy
+
+    restart: unless-stopped
+
+    networks:
+      - endexam-network
+
+volumes:
+  postgres_data:
+    name: endexam-2400031969-postgres-data
+
+networks:
+  endexam-network:
+    name: endexam-2400031969-network
+    driver: bridge
